@@ -25,7 +25,7 @@ Sistema de gestión para la tienda de cosméticos y el salón de depilación / c
 
 Por defecto los datos se guardan en el navegador del dispositivo. Descarga un respaldo desde **Configuración** con frecuencia.
 
-Para sincronizar varios dispositivos en la nube: ejecuta `supabase/schema.sql` en un proyecto de Supabase, crea un usuario y define `VITE_SUPABASE_URL` y `VITE_SUPABASE_ANON_KEY` en Vercel. El sistema pedirá iniciar sesión.
+La sincronización en la nube usa Supabase (`supabase/schema.sql`). En Vercel deben existir `VITE_SUPABASE_URL` y `VITE_SUPABASE_ANON_KEY`; sin ellas el sistema guarda los datos solo en el dispositivo. Los usuarios autorizados se administran en Configuración → Mi cuenta y accesos.
 
 ## Desarrollo
 
