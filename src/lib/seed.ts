@@ -23,6 +23,15 @@ export const defaultSettings: Settings = {
   autoPdf: false,
   productCategories: ['Maquillaje', 'Cuidado facial', 'Cuidado corporal', 'Uñas', 'Accesorios', 'Post-depilación'],
   serviceCategories: ['Depilación con cera', 'Depilación con hilo', 'Cuidado facial', 'Cejas y pestañas', 'Otros'],
+  openTime: '09:00',
+  closeTime: '19:00',
+  slotMinutes: 30,
+  msgConfirm:
+    'Hola {cliente} 💖, tu cita en {negocio} quedó agendada para el {fecha} a las {hora}.\nServicio: {servicios}\nTotal estimado: {total}\n{direccion}\n¡Te esperamos!',
+  msgReminder:
+    'Hola {cliente} 💖, te recordamos tu cita en {negocio} el {fecha} a las {hora} ({servicios}).\nPor favor confírmanos tu asistencia. ¡Gracias!',
+  msgCancel:
+    'Hola {cliente}, tu cita en {negocio} del {fecha} a las {hora} fue cancelada. Escríbenos para reagendar cuando gustes 💖',
   expenseCategories: ['Alquiler', 'Luz', 'Agua', 'Internet / Teléfono', 'Nómina', 'Insumos', 'Publicidad', 'Transporte', 'Mantenimiento', 'Otros'],
 };
 
@@ -67,6 +76,7 @@ export function seedDB(): DB {
     expenses: [],
     cashSessions: [],
     stockMoves: [],
+    appointments: [],
   };
 }
 

@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { update, useDB } from '../lib/store';
-import { fmtDate, money, normalizePhone, sum, uid } from '../lib/utils';
+import { fmtDate, money, normalizePhone, sum, uid, waLink } from '../lib/utils';
 import type { Client } from '../lib/types';
 import { Empty, Field, Modal, PageHead, StatusBadge } from '../components/ui';
 import InvoiceView from '../components/InvoiceView';
@@ -44,7 +44,7 @@ export default function Clientes() {
                     <td className="small">{last ? fmtDate(last) : '—'}</td>
                     <td className="r nowrap">
                       {c.phone && (
-                        <a className="btn sm wa" target="_blank" rel="noreferrer" href={`https://wa.me/${normalizePhone(c.phone, db.settings.countryCode)}`}>WhatsApp</a>
+                        <a className="btn sm wa" target="_blank" rel="noreferrer" href={waLink(normalizePhone(c.phone, db.settings.countryCode))}>WhatsApp</a>
                       )}{' '}
                       <button className="btn sm" onClick={() => setEdit(c)}>Editar</button>
                     </td>

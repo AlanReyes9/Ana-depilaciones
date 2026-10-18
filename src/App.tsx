@@ -4,6 +4,7 @@ import { useDB, openSession } from './lib/store';
 import { cloudEnabled, onCloudStatus, supabase } from './lib/cloud';
 import Dashboard from './pages/Dashboard';
 import POS from './pages/POS';
+import Agenda from './pages/Agenda';
 import Caja from './pages/Caja';
 import Facturas from './pages/Facturas';
 import Cobros from './pages/Cobros';
@@ -16,6 +17,7 @@ import Configuracion from './pages/Configuracion';
 const NAV = [
   { to: '/', label: 'Dashboard', ico: '📊' },
   { to: '/pos', label: 'Punto de venta', ico: '🛍️' },
+  { to: '/agenda', label: 'Agenda de citas', ico: '📅' },
   { to: '/caja', label: 'Caja y cierre', ico: '💵' },
   { to: '/facturas', label: 'Facturas', ico: '🧾' },
   { to: '/cobros', label: 'Cobros', ico: '💳' },
@@ -84,6 +86,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/pos" element={<POS />} />
+          <Route path="/agenda" element={<Agenda />} />
           <Route path="/caja" element={<Caja />} />
           <Route path="/facturas" element={<Facturas />} />
           <Route path="/cobros" element={<Cobros />} />

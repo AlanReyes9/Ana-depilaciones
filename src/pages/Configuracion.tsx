@@ -30,6 +30,7 @@ export default function Configuracion() {
       d.settings = {
         ...f,
         taxRate: num(f.taxRate),
+        slotMinutes: Math.max(5, num(f.slotMinutes) || 30),
         nextInvoice: Math.max(1, Math.floor(num(f.nextInvoice))),
         productCategories: toList(lists.productCategories),
         serviceCategories: toList(lists.serviceCategories),
@@ -133,6 +134,25 @@ export default function Configuracion() {
               </Field>
             ))}
           </div>
+        </div>
+
+        <div className="card grid">
+          <h3>Agenda y mensajes de WhatsApp</h3>
+          <div className="grid g3">
+            <Field label="Abre"><input className="input" type="time" {...text('openTime')} /></Field>
+            <Field label="Cierra"><input className="input" type="time" {...text('closeTime')} /></Field>
+            <Field label="Intervalo (min)">
+              <select className="input" {...text('slotMinutes')}>
+                {[15, 20, 30, 45, 60].map((m) => <option key={m} value={m}>{m}</option>)}
+              </select>
+            </Field>
+          </div>
+          <p className="small muted" style={{ margin: 0 }}>
+            Variables: {'{cliente}'} {'{nombre}'} {'{fecha}'} {'{hora}'} {'{servicios}'} {'{total}'} {'{duracion}'} {'{negocio}'} {'{direccion}'} {'{telefono}'}
+          </p>
+          <Field label="Confirmación de cita"><textarea className="input" style={{ minHeight: 100 }} {...text('msgConfirm')} /></Field>
+          <Field label="Recordatorio"><textarea className="input" style={{ minHeight: 90 }} {...text('msgReminder')} /></Field>
+          <Field label="Cancelación"><textarea className="input" style={{ minHeight: 80 }} {...text('msgCancel')} /></Field>
         </div>
 
         {cloudEnabled && <Cuenta />}

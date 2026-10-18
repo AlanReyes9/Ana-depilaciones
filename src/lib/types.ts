@@ -29,6 +29,12 @@ export interface Settings {
   productCategories: string[];
   serviceCategories: string[];
   expenseCategories: string[];
+  openTime: string;
+  closeTime: string;
+  slotMinutes: number;
+  msgConfirm: string;
+  msgReminder: string;
+  msgCancel: string;
 }
 
 export interface Product {
@@ -172,6 +178,28 @@ export interface StockMove {
   ref: string;
 }
 
+export type AppointmentStatus = 'pendiente' | 'confirmada' | 'completada' | 'cancelada' | 'no asistió';
+export const APPT_STATUS: AppointmentStatus[] = ['pendiente', 'confirmada', 'completada', 'cancelada', 'no asistió'];
+
+export type NoticeType = 'confirmación' | 'recordatorio' | 'cancelación' | 'mensaje';
+
+export interface Appointment {
+  id: string;
+  date: string; // YYYY-MM-DD
+  time: string; // HH:mm
+  duration: number;
+  clientId?: string;
+  clientName: string;
+  clientPhone: string;
+  services: { id: string; name: string; price: number; duration: number }[];
+  total: number;
+  status: AppointmentStatus;
+  notes: string;
+  notices: { type: NoticeType; at: string }[];
+  saleId?: string;
+  createdAt: string;
+}
+
 export interface DB {
   version: number;
   settings: Settings;
@@ -184,4 +212,5 @@ export interface DB {
   expenses: Expense[];
   cashSessions: CashSession[];
   stockMoves: StockMove[];
+  appointments: Appointment[];
 }

@@ -1,5 +1,6 @@
-import { useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { setAppointmentStatus } from '../lib/appointments';
 import { createSale, openCash, openSession, update, useDB } from '../lib/store';
 import { calcTotals, money, num, round2, uid } from '../lib/utils';
 import { PAY_LABEL, PAY_METHODS, type PayMethod, type SaleItem } from '../lib/types';
@@ -38,6 +39,29 @@ export default function POS() {
   const [notes, setNotes] = useState('');
   const [checkout, setCheckout] = useState(false);
   const [lastSale, setLastSale] = useState<string | null>(null);
+  const [apptId, setApptId] = useState<string | null>(null);
+  const loc = useLocation();
+  const navigate = useNavigate();
+
+  // Coming from the agenda: load the appointment's services and client into the cart.
+  useEffect(() => {
+    const id = (loc.state as { appointmentId?: string } | null)?.appointmentId;
+    if (!id) return;
+    const a = db.appointments.find((x) => x.id === id);
+    navigate('.', { replace: true, state: null });
+    if (!a) return;
+    setApptId(a.id);
+    setClient({ id: a.clientId || '', name: a.clientName, phone: a.clientPhone });
+    const items: SaleItem[] = a.services.map((x) => {
+      const sv = db.services.find((y) => y.id === x.id);
+      return { type: 'service', refId: x.id, name: sv?.name || x.name, qty: 1, price: x.price, cost: 0 };
+    });
+    setCart(items);
+    const diff = round2(items.reduce((t, i) => t + i.price, 0) - a.total);
+    if (diff > 0) setDiscount(String(diff));
+    if (a.notes) setNotes(a.notes);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loc.state]);
 
   const catalog = useMemo(() => {
     const qq = q.trim().toLowerCase();
@@ -85,6 +109,7 @@ export default function POS() {
   };
 
   const reset = () => {
+    setApptId(null);
     setCart([]);
     setDiscount('');
     setClient({ id: '', name: '', phone: '' });
@@ -216,6 +241,8 @@ export default function POS() {
             if (s.autoPdf) downloadInvoicePdf(sale, s);
             setCheckout(false);
             reset();
+            if (apptId) setAppointmentStatus(apptId, 'completada', sale.id);
+            setApptId(null);
             setLastSale(sale.id);
           }}
         />

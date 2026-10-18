@@ -2,7 +2,7 @@ import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import type { CashSession, DB, Sale, Settings } from './types';
 import { PAY_LABEL, PAY_METHODS } from './types';
-import { download, fmtDateTime, money, normalizePhone, round2 } from './utils';
+import { download, fmtDateTime, money, normalizePhone, round2, waLink } from './utils';
 import { sessionSummary } from './store';
 
 const PINK: [number, number, number] = [216, 27, 122];
@@ -214,7 +214,7 @@ export async function sendInvoiceWhatsApp(sale: Sale, s: Settings, phone?: strin
   }
   download(blob, invoiceFileName(sale));
   const p = normalizePhone(phone ?? sale.clientPhone, s.countryCode);
-  const url = `https://wa.me/${p}?text=${encodeURIComponent(text)}`;
+  const url = waLink(p, text);
   window.open(url, '_blank');
   return 'link';
 }

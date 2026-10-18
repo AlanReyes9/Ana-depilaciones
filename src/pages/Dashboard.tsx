@@ -4,6 +4,7 @@ import { openSession, sessionSummary, useDB } from '../lib/store';
 import { dayKey, money, monthKey, round2, sum } from '../lib/utils';
 import { PAY_LABEL, PAY_METHODS } from '../lib/types';
 import { PageHead, Stat } from '../components/ui';
+import { fmtTime, isActive } from '../lib/appointments';
 
 type Period = 'hoy' | 'semana' | 'mes' | 'anio';
 
@@ -107,6 +108,8 @@ export default function Dashboard() {
         <Stat label="Efectivo en caja" value={cash === null ? 'Cerrada' : money(cash)} hint={`Por pagar a proveedores: ${money(data.payable)}`} />
       </div>
 
+      <TodayAppointments />
+
       <div className="grid g2" style={{ marginTop: 14 }}>
         <div className="card">
           <h3>Ventas vs gastos · últimos 14 días</h3>
@@ -180,5 +183,28 @@ export default function Dashboard() {
         </div>
       </div>
     </>
+  );
+}
+
+function TodayAppointments() {
+  const db = useDB();
+  const today = dayKey();
+  const list = db.appointments.filter((a) => a.date === today && isActive(a)).sort((a, b) => a.time.localeCompare(b.time));
+  return (
+    <div className="card" style={{ marginTop: 14 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+        <h3 style={{ margin: 0 }}>📅 Citas de hoy ({list.length})</h3>
+        <Link to="/agenda" className="btn sm">Ver agenda</Link>
+      </div>
+      {list.length === 0 ? <div className="small muted">No hay citas para hoy.</div> : (
+        <div className="btns">
+          {list.map((a) => (
+            <span key={a.id} className={`badge ${a.status === 'completada' ? 'ok' : a.status === 'confirmada' ? 'pink' : 'warn'}`} style={{ fontSize: 12 }}>
+              {fmtTime(a.time)} · {a.clientName} · {a.services.map((x) => x.name).join(', ')}
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }

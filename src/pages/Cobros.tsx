@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useDB } from '../lib/store';
-import { dayKey, fmtDate, fmtDateTime, money, normalizePhone, sum } from '../lib/utils';
+import { dayKey, fmtDate, fmtDateTime, money, normalizePhone, sum, waLink } from '../lib/utils';
 import { PAY_LABEL } from '../lib/types';
 import { Empty, PageHead, Stat } from '../components/ui';
 import InvoiceView, { PaymentModal } from '../components/InvoiceView';
@@ -40,7 +40,7 @@ export default function Cobros() {
 
   const remind = (name: string, phone: string, total: number) => {
     const msg = `Hola ${name} 💖, te saluda ${db.settings.businessName}. Te recordamos que tienes un balance pendiente de ${money(total)}. ¡Gracias!`;
-    window.open(`https://wa.me/${normalizePhone(phone, db.settings.countryCode)}?text=${encodeURIComponent(msg)}`, '_blank');
+    window.open(waLink(normalizePhone(phone, db.settings.countryCode), msg), '_blank');
   };
 
   return (

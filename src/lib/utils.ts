@@ -66,3 +66,7 @@ export const download = (blob: Blob, filename: string) => {
 };
 
 export const sum = <T,>(arr: T[], f: (x: T) => number) => round2(arr.reduce((a, x) => a + f(x), 0));
+
+/** WhatsApp click-to-chat link. Uses api.whatsapp.com directly because the wa.me redirect garbles emoji. */
+export const waLink = (phone: string, text = '') =>
+  `https://api.whatsapp.com/send?phone=${phone}${text ? `&text=${encodeURIComponent(text)}` : ''}`;
