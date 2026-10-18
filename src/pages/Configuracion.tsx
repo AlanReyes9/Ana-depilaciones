@@ -5,6 +5,7 @@ import type { Settings } from '../lib/types';
 import { Field, PageHead } from '../components/ui';
 import { emptyDB, seedDB } from '../lib/seed';
 import { cloudEnabled } from '../lib/cloud';
+import Cuenta from '../components/Cuenta';
 
 type ListKey = 'productCategories' | 'serviceCategories' | 'expenseCategories';
 
@@ -133,6 +134,8 @@ export default function Configuracion() {
             ))}
           </div>
         </div>
+
+        {cloudEnabled && <Cuenta />}
 
         <div className="card grid">
           <h3>Datos y respaldos</h3>
