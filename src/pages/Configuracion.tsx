@@ -6,6 +6,7 @@ import { Field, PageHead } from '../components/ui';
 import { emptyDB, seedDB } from '../lib/seed';
 import { cloudEnabled } from '../lib/cloud';
 import Cuenta from '../components/Cuenta';
+import { DEFAULT_LOGO, prepareLogo } from '../lib/logo';
 
 type ListKey = 'productCategories' | 'serviceCategories' | 'expenseCategories';
 
@@ -77,10 +78,13 @@ export default function Configuracion() {
       <div className="grid g2">
         <div className="card grid">
           <h3>Datos del negocio</h3>
-          <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-            <img src="/brand-art.jpg" alt="Línea gráfica" style={{ width: 110, borderRadius: 12, border: '1px solid var(--line)' }} />
-            <div className="small muted">Logo y línea gráfica de Ana Depilaciones. Se usan en facturas, recibos y cierres.</div>
-          </div>
+          <LogoEditor
+            settings={f}
+            onChange={(patch) => {
+              setF({ ...f, ...patch });
+              update((d) => void Object.assign(d.settings, patch));
+            }}
+          />
           <Field label="Nombre comercial"><input className="input" {...text('businessName')} /></Field>
           <Field label="Eslogan / descripción"><input className="input" {...text('slogan')} /></Field>
           <div className="grid g2">
@@ -180,5 +184,47 @@ export default function Configuracion() {
         </div>
       </div>
     </>
+  );
+}
+
+function LogoEditor({ settings, onChange }: { settings: Settings; onChange: (p: Partial<Settings>) => void }) {
+  const [error, setError] = useState('');
+  const pick = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    setError('');
+    try {
+      onChange({ logo: await prepareLogo(file) });
+    } catch (err) {
+      setError((err as Error).message);
+    }
+  };
+  return (
+    <div style={{ display: 'flex', gap: 14, alignItems: 'center', flexWrap: 'wrap' }}>
+      <img
+        src={settings.logo || DEFAULT_LOGO}
+        alt="Logo"
+        style={{
+          width: 96, height: 96, objectFit: settings.logoRound ? 'cover' : 'contain', background: '#fff',
+          borderRadius: settings.logoRound ? '50%' : 12, border: '2px solid var(--pink-3)',
+        }}
+      />
+      <div className="grid" style={{ gap: 8, flex: 1, minWidth: 200 }}>
+        <div className="small muted">Logo del negocio: aparece en el menú, las facturas, los recibos, los cierres y el ícono de la pestaña.</div>
+        <div className="btns">
+          <label className="btn sm primary">
+            📷 Cambiar logo
+            <input type="file" accept="image/*" onChange={pick} hidden />
+          </label>
+          {settings.logo && <button className="btn sm" onClick={() => onChange({ logo: '' })}>Restaurar original</button>}
+        </div>
+        <label className="check small">
+          <input type="checkbox" checked={settings.logoRound} onChange={(e) => onChange({ logoRound: e.target.checked })} />
+          Mostrar en círculo (desmárcalo si el logo tiene texto o es rectangular)
+        </label>
+        {error && <span className="badge bad">{error}</span>}
+      </div>
+    </div>
   );
 }

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { NavLink, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { useDB, openSession } from './lib/store';
 import { cloudEnabled, onCloudStatus, supabase } from './lib/cloud';
+import { logoSrc } from './lib/logo';
 import Dashboard from './pages/Dashboard';
 import POS from './pages/POS';
 import Agenda from './pages/Agenda';
@@ -47,13 +48,22 @@ export default function App() {
   const loc = useLocation();
   useEffect(() => setOpen(false), [loc.pathname]);
   const cash = openSession(db);
+  const logo = logoSrc(db.settings);
+  const logoCls = db.settings.logoRound ? '' : 'square';
+  const [brand, ...rest] = db.settings.businessName.trim().split(/\s+/);
+
+  useEffect(() => {
+    const link = document.querySelector<HTMLLinkElement>('link[rel="icon"]');
+    if (link) link.href = logo;
+    document.title = `${db.settings.businessName} · ERP`;
+  }, [logo, db.settings.businessName]);
 
   return (
     <div className="app">
       <header className="topbar">
         <button className="btn sm" onClick={() => setOpen(true)} aria-label="Menú">☰</button>
-        <img src="/logo.png" alt="" />
-        <span className="name script">Ana</span>
+        <img src={logo} alt="" className={logoCls} />
+        <span className="name script">{brand}</span>
         <span style={{ marginLeft: 'auto' }} className={`badge ${cash ? 'ok' : 'warn'}`}>
           {cash ? 'Caja abierta' : 'Caja cerrada'}
         </span>
@@ -61,10 +71,10 @@ export default function App() {
       {open && <div className="backdrop" onClick={() => setOpen(false)} />}
       <aside className={`sidebar ${open ? 'open' : ''}`}>
         <div className="brand">
-          <img src="/logo.png" alt="Ana" />
+          <img src={logo} alt={db.settings.businessName} className={logoCls} />
           <div>
-            <div className="name script">Ana</div>
-            <div className="sub">COSMETICS &amp;<br />DEPILACIONES</div>
+            <div className="name script">{brand}</div>
+            {rest.length > 0 && <div className="sub">{rest.join(' ').toUpperCase()}</div>}
           </div>
         </div>
         <nav className="nav">

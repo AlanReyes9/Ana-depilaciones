@@ -35,6 +35,9 @@ export interface Settings {
   msgConfirm: string;
   msgReminder: string;
   msgCancel: string;
+  /** Custom logo as a PNG data URL; empty uses the built-in logo. */
+  logo: string;
+  logoRound: boolean;
 }
 
 export interface Product {

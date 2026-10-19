@@ -4,14 +4,16 @@ import type { CashSession, DB, Sale, Settings } from './types';
 import { PAY_LABEL, PAY_METHODS } from './types';
 import { download, fmtDateTime, money, normalizePhone, round2, waLink } from './utils';
 import { sessionSummary } from './store';
+import { DEFAULT_LOGO } from './logo';
 
 const PINK: [number, number, number] = [216, 27, 122];
 
 let logoCache: string | null = null;
-async function logo(): Promise<string | null> {
+async function logo(s: Settings): Promise<string | null> {
+  if (s.logo) return s.logo;
   if (logoCache) return logoCache;
   try {
-    const blob = await (await fetch('/logo.png')).blob();
+    const blob = await (await fetch(DEFAULT_LOGO)).blob();
     logoCache = await new Promise<string>((res, rej) => {
       const r = new FileReader();
       r.onload = () => res(r.result as string);
@@ -30,7 +32,7 @@ const esc = (s: string) =>
 // ---------------- PDF ----------------
 
 async function receiptPdf(sale: Sale, s: Settings) {
-  const img = await logo();
+  const img = await logo(s);
   // Draw once on a long roll to measure the content, then again at the exact length.
   const probe = drawReceipt(sale, s, img, 600);
   return drawReceipt(sale, s, img, probe.y + 6).doc;
@@ -112,7 +114,7 @@ function drawReceipt(sale: Sale, s: Settings, img: string | null, H: number) {
 }
 
 async function letterPdf(sale: Sale, s: Settings) {
-  const img = await logo();
+  const img = await logo(s);
   const doc = new jsPDF({ unit: 'mm', format: 'letter' });
   const W = doc.internal.pageSize.getWidth();
   doc.setFillColor(253, 238, 245).rect(0, 0, W, 42, 'F');
@@ -231,7 +233,7 @@ function printHtml(body: string, format: '80mm' | 'carta') {
     table{width:100%;border-collapse:collapse} td,th{padding:2px 0;vertical-align:top}
     ${format === 'carta' ? 'th{background:#d81b7a;color:#fff;padding:6px} td{padding:6px;border-bottom:1px solid #f3d0e2}' : ''}
     .tot td{font-size:1.15em;font-weight:bold;color:#d81b7a}
-    img.logo{width:${format === '80mm' ? '22mm' : '30mm'};height:auto;border-radius:50%}
+    img.logo{width:${format === '80mm' ? '22mm' : '30mm'};height:auto} img.round{border-radius:50%}
     @page{size:${format === '80mm' ? '80mm auto' : 'letter'};margin:${format === '80mm' ? '0' : '10mm'}}
   `;
   const html = `<!doctype html><html><head><meta charset="utf-8"><title>Imprimir</title><style>${css}</style></head>
@@ -257,7 +259,7 @@ function printHtml(body: string, format: '80mm' | 'carta') {
 
 function headerHtml(s: Settings) {
   return `<div class="c">
-    <img class="logo" src="${location.origin}/logo.png" />
+    <img class="logo${s.logoRound ? ' round' : ''}" src="${s.logo || location.origin + DEFAULT_LOGO}" />
     <div class="brand">${esc(s.businessName)}</div>
     ${s.slogan ? `<div class="muted">${esc(s.slogan)}</div>` : ''}
     ${s.rnc ? `<div class="muted">RNC: ${esc(s.rnc)}</div>` : ''}
@@ -347,7 +349,7 @@ export function printClose(db: DB, cs: CashSession) {
 
 export async function downloadClosePdf(db: DB, cs: CashSession) {
   const s = db.settings;
-  const img = await logo();
+  const img = await logo(s);
   const { rows, recon } = closeRows(db, cs);
   const doc = new jsPDF({ unit: 'mm', format: 'letter' });
   const W = doc.internal.pageSize.getWidth();

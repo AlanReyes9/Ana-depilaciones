@@ -23,6 +23,8 @@ export const defaultSettings: Settings = {
   autoPdf: false,
   productCategories: ['Maquillaje', 'Cuidado facial', 'Cuidado corporal', 'Uñas', 'Accesorios', 'Post-depilación'],
   serviceCategories: ['Depilación con cera', 'Depilación con hilo', 'Cuidado facial', 'Cejas y pestañas', 'Otros'],
+  logo: '',
+  logoRound: true,
   openTime: '09:00',
   closeTime: '19:00',
   slotMinutes: 30,
